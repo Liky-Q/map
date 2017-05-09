@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+		 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>demo</title>    
+	
+	<link rel="stylesheet" type="text/css" href="data/ol.css">
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="stylesheet" type="text/css" href="css/demo.css">
+	<link rel="stylesheet" href="data/jquery-ui.min.css">
+	<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+	<script src="data/ol.js"></script>
+	
+</head>
+
+<body>
+	<div id="map" >
+		<!-- 比例尺 -->
+		<div id="rotation"></div> 
+		<!-- 鼠标位置  -->
+		<div id="location"></div>
+		
+	</div>
+	<div id="popup" class="ol-popup">
+        <span id="popup-closer" class="ol-popup-closer"></span>
+        <div id="popup-content">
+        	<ul id="popupContentMsg">
+        		<!--<li>温度:</li>
+        		<li>TSP:</li>
+        		<li>风向:</li>
+        		<li>时间:</li>
+        		<li>大气压:</li>
+        		<li>风速:</li>
+        		<li>楼号:</li>
+        		<li>PM2.5:</li>
+        		<li>PM10:</li>-->
+        	</ul>
+        </div>
+    	<div id="lineEchart">
+    		楼层查询：
+    		<select id="floor">
+    			<!--<option value="">1</option>-->
+    		</select>
+    	</div> 
+    </div>
+    
+	<!--<div id="echartBox" class="echartBox">
+		<div id="echart" class="echart">sdfghjk</div>
+		<span id="echartCloser" class="echart-closer"></span>
+		
+	</div>-->
+	 <div id="suspend" class="suspend"></div>    
+    
+	<!-- 功能按钮 -->
+	<div class="funBtn" >
+		<div class="layercontrol" title="图层管理" id="layercontrol">
+			<div class="lays">
+				<input type="radio" name="bigMap" id="oneMap" value="" checked="checked" /><label for="oneMap" >矢量地图</label><br />
+				<input type="radio" name="bigMap" id="twoMap" value="" /><label for="twoMap">遥感影像</label><br/>
+				<input type="checkbox" name="one" id="one" value="" checked="checked" /><label for="one" >图层一</label><br />
+				<input type="checkbox" name="two" id="two" value="" checked="checked"/><label for="two">图层二</label><br/>
+				<span class="closeLay">  </span>
+			</div>		
+		</div>
+		<!--<div class="findfloor">楼层数据查询</div>-->
+		<div class="findvill" title="小区查询">
+			<div class="village">
+				<ol id="villageList">
+					<li>嘉园一里</li>
+					<li>嘉园二里</li>
+					<li>嘉园三里</li>
+					<li>嘉园四里</li>
+				</ol>
+			</div>
+		</div>
+		<!--渲染-->
+		<div class="renderingBtn" title="渲染">
+			<div class="rendering">
+				<ol id="renderingList">
+					<li>TSP</li>
+					<li>PM2.5</li>
+					<li>PM10</li>
+					<li>噪声</li>
+					
+				</ol>
+			</div>
+		</div>
+		<!--自动监测数据查询-->
+		<div class="autoDetect" >
+			<div class="autoDetectContent clearfix" id="autoDetectContent">
+				<div class="autoDetectNav">
+					
+				</div>
+				<div class="ADContentBox">
+					<div class="contentBoxTop clearfix">
+						<div class="airQuality clearfix">
+							<h3>
+								实时空气质量情况
+								<!--<span>
+									详细...
+									<i></i>
+								</span>-->
+							</h3>
+							<div class="airLeft">
+								<h2>北京</h2>
+								<div class="polluteNum">
+									162
+									<div>
+										<p>轻度污染</p>
+										<p>AQI指数</p>
+									</div>
+								</div>
+								<div class="polluteMsgCenter clearfix">
+									<div>
+										<p>首要污染物</p>
+										<p>浓度值</p>
+									</div>
+									<div>
+										<p>PM2.5</p>
+										<p>
+											23.66
+											<span>微克/立方米</span>
+										</p>
+									</div>
+								</div>
+								<p>
+									明天环境指数23，较差，不建议外出活动
+								</p>
+							</div>
+							<div class="airRight">
+								<p>（2017年04月10日13时）</p>
+								<div><img src="images/pic.png"/></div>
+								<div class="suggest">
+									<p>极少数异常敏感人群应减少户外活动。</p>
+									<p>建议采取的措施</p>
+								</div>
+							</div>
+						</div>
+						<div class="convention">
+							<h3>
+								常规因子
+								<!--<span>
+									详细...
+									<i></i>
+								</span>-->
+							</h3>
+							<div class="search">
+								<span>站点：</span>
+								<select name="">
+									<option value="">1</option>
+									<option value="">2</option>
+									<option value="">3</option>
+									<option value="">4</option>
+									<option value="">5</option>
+								</select>
+								<span>因子：</span>
+								<select name="">
+									<option value="TSP">TSP</option>
+									<option value="PM2.5">PM2.5</option>
+									<option value="PM10">PM10</option>
+									<option value="噪声">噪声</option>
+								</select>
+								<button id="submit">查询</button>
+							</div>
+							<div class="searchChart" id="searchChart">
+								
+							</div>
+						</div>
+						<div class="siteQuery">
+							<h3>
+								站点查询
+								<!--<span>
+									详细...
+									<i></i>
+								</span>-->
+							</h3>
+							<div class="search">
+								<span>时间：</span>
+								<input type="text" id="datepicker1">
+								<span>因子：</span>
+								<select name="">
+									<option value="TSP">TSP</option>
+									<option value="PM2.5">PM2.5</option>
+									<option value="PM10">PM10</option>
+									<option value="噪声">噪声</option>
+								</select>
+								<button id="siteQuerySubmit">查询</button>
+							</div>
+							<div class="searchChart" id="siteQueryChart">
+								
+							</div>
+						</div>
+						<div>
+							<h3>
+								超标情况查询
+								<!--<span>
+									详细...
+									<i></i>
+								</span>-->
+							</h3>
+							<div class="search">
+								<span>时间：</span>
+								<input type="text" id="datepicker2">
+								<span>因子：</span>
+								<select name="">
+									<option value="TSP">TSP</option>
+									<option value="PM2.5">PM2.5</option>
+									<option value="PM10">PM10</option>
+									<option value="噪声">噪声</option>
+								</select>
+								<button id="excessiveSubmit">查询</button>
+							</div>
+							<div class="searchChart" id="excessiveChart">
+								
+							</div>
+						</div>
+						
+					</div>
+					<div class="excessive">
+							<h3>
+								噪声分布查询
+								
+							</h3>
+							<div class="distributeSearch search">
+								<span>站点：</span>
+								<select name="">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+								</select>
+								<span>起始时间：</span>
+								<input type="text" id="datepicker3">
+								<span>结束时间：</span>
+								<input type="text" id="datepicker4">
+								<button id="distributeSubmit">查询</button>
+							</div>
+							<div class="bigChart" id="distributeChart">
+								
+							</div>
+						</div>
+						<div class="excessive">
+							<h3>
+								自动监测信息查询
+							</h3>
+							<div class="distributeSearch search">
+								<span>站点：</span>
+								<select name="">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+								</select>
+								<span>因子：</span>
+								<select name="">
+									<option value="TSP">TSP</option>
+									<option value="PM2.5">PM2.5</option>
+									<option value="PM10">PM10</option>
+								</select>
+								<span>起始时间：</span>
+								<input type="text" id="datepicker5">
+								<span>结束时间：</span>
+								<input type="text" id="datepicker6">
+								<button id="monitorSubmit">查询</button>
+							</div>
+							<div class="bigChart" id="monitorChart">
+								
+							</div>
+						</div>
+					<table class="tableAQI" id="tableAQI">
+						<tr>
+							<th>站点名</th>
+							<th>时间</th>
+							<th>温度</th>
+							<th>TSP</th>
+							<th>风向</th>
+							<th>风速</th>
+							<th>大气压</th>
+							<th>PM2.5</th>
+							<th>PM10</th>
+							<th>湿度</th>
+							<th>噪声</th>
+						</tr>
+						<tr>
+							<td>嘉园一里</td>
+							<td>2017-04-10</td>
+							<td>24.3</td>
+							<td>34.0</td>
+							<td>294.0</td>
+							<td>0.0</td>
+							<td>1009.9</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园二里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园三里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园四里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园5里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园6里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园7里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+						<tr>
+							<td>嘉园8里</td>
+							<td>2017-04-10</td>
+							<td>24.4</td>
+							<td>34.0</td>
+							<td>294.2</td>
+							<td>0.1</td>
+							<td>1009.6</td>
+							<td>16.5</td>
+							<td>36.6</td>
+							<td>55.1</td>
+							<td>11</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+
+	
+    
+
+	
+	<script src="data/jquery-3.2.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="data/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="data/echarts.min.js"></script>
+	<script type="text/javascript" src="data/timepicket.js"></script>
+	<script type="text/javascript" src="js/demo.js"></script>
+</body>
+</html>
